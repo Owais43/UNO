@@ -1,0 +1,68 @@
+import random
+
+
+colors = ["Red", "Yellow", "Green", "Blue"]
+numbers = list(range(0, 10))
+
+
+deck = [(color, number) for color in colors for number in numbers] * 2  
+random.shuffle(deck)
+
+
+player1_hand = [deck.pop() for _ in range(7)]
+player2_hand = [deck.pop() for _ in range(7)]
+
+
+draw_pile = deck
+discard_pile = [draw_pile.pop()]
+
+def show_hand(player, hand):
+    print(f"{player}'s hand:")
+    for idx, card in enumerate(hand):
+        print(f"{idx + 1}: {card[0]} {card[1]}")
+    print()
+
+
+def can_play(card, top_card):
+    return card[0] == top_card[0] or card[1] == top_card[1]
+
+
+def draw_card(hand):
+    if draw_pile:
+        hand.append(draw_pile.pop())
+    else:
+        print("The draw pile is empty!")
+
+
+current_player = "Player 1"
+while player1_hand and player2_hand:
+    print(f"Top card: {discard_pile[-1][0]} {discard_pile[-1][1]}")
+
+    if current_player == "Player 1":
+        show_hand("Player 1", player1_hand)
+        player_hand = player1_hand
+    else:
+        show_hand("Player 2", player2_hand)
+        player_hand = player2_hand
+
+ 
+    playable = [card for card in player_hand if can_play(card, discard_pile[-1])]
+
+    if playable:
+        choice = int(input(f"{current_player}, choose a card to play (1-{len(playable)}): ")) - 1
+        chosen_card = playable[choice]
+        player_hand.remove(chosen_card)
+        discard_pile.append(chosen_card)
+        print(f"{current_player} played {chosen_card[0]} {chosen_card[1]}\n")
+    else:
+        print(f"{current_player} has no playable cards. Drawing a card...\n")
+        draw_card(player_hand)
+
+    
+    current_player = "Player 2" if current_player == "Player 1" else "Player 1"
+
+
+if not player1_hand:
+    print("Player 1 wins!")
+else:
+    print("Player 2 wins!")
